@@ -9,23 +9,25 @@ import {
     ImageBackground, 
     Platform, 
     SafeAreaView, 
-    ScrollView, 
     StatusBar, 
     Text, 
     ToastAndroid, 
+    TouchableOpacity, 
     View 
 } from 'react-native'
 import WebView from 'react-native-webview'
-import NetInfo from '@react-native-community/netinfo'
+import { fetch } from '@react-native-community/netinfo'
 
 function App() {
+    const SIMPLE_NAPI_BASE_URL = 'https://simpelnapi.kejarilomboktengah.id/'
     const webViewRef = useRef(null)
     const [canGoBack, setCanGoBack] = useState(false)
     // const [canGoForward, setCanGoForward] = useState(false)
-    // const [currentUrl, setCurrentUrl] = useState('')
+    const [currentUrl, setCurrentUrl] = useState('')
     const [backPressed, setBackPressed] = useState(0)
     const [isConnected, setConnected] = useState(true)
 
+    // handle hardware back press
     const handleBackPress = useCallback(() => {
         if (canGoBack) {
             webViewRef.current.goBack()
@@ -46,18 +48,20 @@ function App() {
         }
     }, [handleBackPress])
 
+    // Get the network state once:
+    const fetchConnection = () => {
+        console.log('fetchConnection...')
+        fetch().then(state => {
+            setConnected(state.isConnected)
+        })
+    }
+
     // check internet connections status
     useEffect(() => {
-		const unsubscribe = NetInfo.addEventListener((state) => {
-			setConnected(state.isConnected)
-		})
+		fetchConnection()
+	}, [handleBackPress, currentUrl])
 
-		return () => {
-			unsubscribe()
-		}
-	}, [isConnected])
-
-    // show message with toast when pressed twice
+    // show message with toast when hardware back pressed twice
     const showToast = () => {
         if (backPressed === 0) {
             setBackPressed(prevCount => prevCount + 1)
@@ -68,8 +72,6 @@ function App() {
         }
     }
 
-    const URL = 'https://simpelnapi.kejarilomboktengah.id/'
-
     return (
         <SafeAreaView style={{ flex: 1 }}>
             <StatusBar 
@@ -77,18 +79,11 @@ function App() {
                 backgroundColor={'white'} 
                 barStyle={'dark-content'} 
             />
-            <ScrollView 
-                contentContainerStyle={{ flex:1,}} 
-                showsVerticalScrollIndicator={false}
-            >
-                {!isConnected && <OfflineScreen />}
-                {/* <Text>canGoBack {canGoBack ? 'true' : 'false'}</Text>
-                <Text>canGoForward {canGoForward ? 'true' : 'false'}</Text>
-                <Text>currentUrl {currentUrl}</Text>
-                <Text>backPressed {backPressed}</Text> */}
-                {isConnected && <WebView
+            {!isConnected && <OfflineScreen onReload={() => fetch().then(state => {setConnected(state.isConnected)})} />}
+            {isConnected && 
+                <WebView
                     ref={webViewRef}
-                    source={{ uri: URL }}
+                    source={{ uri: SIMPLE_NAPI_BASE_URL }}
                     style={{ marginTop: 0 }}
                     sharedCookiesEnabled={true}
                     geolocationEnabled={true}
@@ -99,19 +94,26 @@ function App() {
                     onNavigationStateChange={(navState) => {
                         setCanGoBack(navState.canGoBack)
                         // setCanGoForward(navState.canGoForward)
-                        // setCurrentUrl(navState.url)
+                        setCurrentUrl(navState.url)
                     }}
                     // startInLoadingState={true}
                     // renderLoading={() => <ActivityIndicator size="large" color="#00ff00" />}
-                />}
-            </ScrollView>
+                />
+            }
         </SafeAreaView>
     )
 }
 
-const OfflineScreen = () => {
+const OfflineScreen = ({onReload}) => {
     return (
-        <SafeAreaView style={{ flex: 1, backgroundColor: '#f5f5f5', paddingHorizontal:20, paddingVertical:80, alignItems: 'center', }}>
+        <SafeAreaView style={{ 
+            flex: 1, 
+            backgroundColor: '#f5f5f5', 
+            paddingHorizontal:10, 
+            paddingVertical:30, 
+            alignItems: 'center', 
+            justifyContent: 'space-between' 
+        }}>
             <ImageBackground 
                 source={require('./assets/image/no_wifi_image.png')} 
                 resizeMode="contain" 
@@ -123,12 +125,39 @@ const OfflineScreen = () => {
                 }}
             />
             <View>
-                <Text style={{ color: 'black', fontSize:36, textAlign:'center',fontWeight:'bold' }}>
+                <Text style={{ 
+                    color: '#73849f', 
+                    fontSize:36, 
+                    textAlign:'center', 
+                    fontWeight:'bold', 
+                }}>
                     Oops!
                 </Text>
-                <Text style={{ color: 'black', fontSize:20, textAlign:'center' }}>
+                <Text style={{ 
+                    color: '#8793a5', 
+                    fontSize:20, 
+                    textAlign:'center' 
+                }}>
                     No Internet Connection, Please check your connection settings!
                 </Text>
+                <TouchableOpacity 
+                    onPress={() => onReload()}
+                    style={{ 
+                        marginTop:10,
+                        paddingVertical:16,
+                        backgroundColor: '#8793a5',
+                        alignItems: 'center',
+                        borderRadius: 50,
+                    }}
+                >
+                    <Text style={{ 
+                        fontSize:20, 
+                        color: '#f2f2f2', 
+                        fontWeight: '700'
+                    }}>
+                        Refresh
+                    </Text>
+                </TouchableOpacity>
             </View>
         </SafeAreaView>
     )
