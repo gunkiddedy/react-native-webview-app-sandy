@@ -108,14 +108,14 @@ const OfflineScreen = ({onReload}) => {
     return (
         <SafeAreaView style={{ 
             flex: 1, 
-            backgroundColor: '#f5f5f5', 
+            backgroundColor: '#fff', 
             paddingHorizontal:10, 
             paddingVertical:30, 
             alignItems: 'center', 
-            justifyContent: 'space-between' 
+            justifyContent: 'space-between',
         }}>
             <ImageBackground 
-                source={require('./assets/image/no_wifi_image.png')} 
+                source={require('./assets/image/404.jpg')} 
                 resizeMode="contain" 
                 style={{ 
                     flex:1, 
@@ -123,42 +123,46 @@ const OfflineScreen = ({onReload}) => {
                     width: '100%',
                     height: '100%',
                 }}
-            />
-            <View>
-                <Text style={{ 
-                    color: '#73849f', 
-                    fontSize:36, 
-                    textAlign:'center', 
-                    fontWeight:'bold', 
-                }}>
-                    Oops!
-                </Text>
-                <Text style={{ 
-                    color: '#8793a5', 
-                    fontSize:20, 
-                    textAlign:'center' 
-                }}>
-                    No Internet Connection, Please check your connection settings!
-                </Text>
-                <TouchableOpacity 
-                    onPress={() => onReload()}
-                    style={{ 
-                        marginTop:10,
-                        paddingVertical:16,
-                        backgroundColor: '#8793a5',
-                        alignItems: 'center',
-                        borderRadius: 50,
-                    }}
-                >
-                    <Text style={{ 
-                        fontSize:20, 
-                        color: '#f2f2f2', 
-                        fontWeight: '700'
-                    }}>
-                        Refresh
-                    </Text>
-                </TouchableOpacity>
-            </View>
+            >
+                <View style={{ position: 'absolute', bottom:50, alignSelf: 'center' }}>
+                    <View style={{ paddingHorizontal:20, }}>
+                        <Text style={{ 
+                            color: '#73849f', 
+                            fontSize:36, 
+                            textAlign:'center', 
+                            fontWeight:'bold', 
+                        }}>
+                            Oops!
+                        </Text>
+                        <Text style={{ 
+                            color: '#8793a5', 
+                            fontSize:20, 
+                            textAlign:'center',
+                        }}>
+                            No Internet Connection, Please check your connection settings!
+                        </Text>
+                    </View>
+                    <TouchableOpacity 
+                        onPress={() => onReload()}
+                        style={{ 
+                            marginTop:10,
+                            paddingVertical:12,
+                            backgroundColor: '#17262c',
+                            alignItems: 'center',
+                            borderRadius: 50,
+                        }}
+                    >
+                        <Text style={{ 
+                            fontSize:20, 
+                            color: '#f2f2f2', 
+                            fontWeight: '700'
+                        }}>
+                            Refresh
+                        </Text>
+                    </TouchableOpacity>
+                </View>
+            </ImageBackground>
+            
         </SafeAreaView>
     )
 }
